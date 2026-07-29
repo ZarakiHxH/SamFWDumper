@@ -9,13 +9,18 @@
 # Commercial use, removal of this header, or distribution without attribution
 # is strictly prohibited. For permissions: https://github.com/Xiatsuma
 # =============================================================================
-set -e
+set -eo pipefail
 
 echo "═══════════════════════════════════════"
 echo "   Samsung Special Targeted Extractor"
 echo "═══════════════════════════════════════"
 
 URL="$1"
+[ -z "$URL" ] && { echo "❌ No URL provided"; exit 1; }
+if ! echo "$URL" | grep -qE '^https?://'; then
+  echo "❌ Invalid URL: must start with http:// or https://"
+  exit 1
+fi
 COMPRESSION_LEVEL="${2:-0}"
 SHOW_ALL="${3:-false}"
 OUTPUT_NAME="${4:-Apps}"
