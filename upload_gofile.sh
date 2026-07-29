@@ -9,7 +9,7 @@
 # Commercial use, removal of this header, or distribution without attribution
 # is strictly prohibited. For permissions: https://github.com/Xiatsuma
 # =============================================================================
-set -e
+set -eo pipefail
 
 FILE="$1"
 if [ ! -f "$FILE" ]; then
