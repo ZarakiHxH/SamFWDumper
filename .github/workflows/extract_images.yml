@@ -121,23 +121,41 @@ jobs:
         run: chmod +x tools/android-tools/* tools/erofs-utils/* upload_gofile.sh scripts/extract_images.sh
 
       - name: Run SamFWDumper
+        env:
+          INPUT_URL: ${{ github.event.inputs.url }}
+          INPUT_COMPRESSION: ${{ github.event.inputs.compression }}
+          INPUT_SYSTEM: ${{ github.event.inputs.extract_system }}
+          INPUT_SYSTEM_EXT: ${{ github.event.inputs.extract_system_ext }}
+          INPUT_PRODUCT: ${{ github.event.inputs.extract_product }}
+          INPUT_VENDOR: ${{ github.event.inputs.extract_vendor }}
+          INPUT_VENDOR_BOOT: ${{ github.event.inputs.extract_vendor_boot }}
+          INPUT_VENDOR_DLKM: ${{ github.event.inputs.extract_vendor_dlkm }}
+          INPUT_SYSTEM_DLKM: ${{ github.event.inputs.extract_system_dlkm }}
+          INPUT_ODM: ${{ github.event.inputs.extract_odm }}
+          INPUT_ODM_DLKM: ${{ github.event.inputs.extract_odm_dlkm }}
+          INPUT_BOOT: ${{ github.event.inputs.extract_boot }}
+          INPUT_INIT_BOOT: ${{ github.event.inputs.extract_init_boot }}
+          INPUT_VBMETA: ${{ github.event.inputs.extract_vbmeta }}
+          INPUT_VBMETA_SYSTEM: ${{ github.event.inputs.extract_vbmeta_system }}
+          INPUT_DTBO: ${{ github.event.inputs.extract_dtbo }}
+          INPUT_RECOVERY: ${{ github.event.inputs.extract_recovery }}
         run: |
           PARTITIONS=""
-          ${{ github.event.inputs.extract_system }} && PARTITIONS="$PARTITIONS system"
-          ${{ github.event.inputs.extract_system_ext }} && PARTITIONS="$PARTITIONS system_ext"
-          ${{ github.event.inputs.extract_product }} && PARTITIONS="$PARTITIONS product"
-          ${{ github.event.inputs.extract_vendor }} && PARTITIONS="$PARTITIONS vendor"
-          ${{ github.event.inputs.extract_vendor_boot }} && PARTITIONS="$PARTITIONS vendor_boot"
-          ${{ github.event.inputs.extract_vendor_dlkm }} && PARTITIONS="$PARTITIONS vendor_dlkm"
-          ${{ github.event.inputs.extract_system_dlkm }} && PARTITIONS="$PARTITIONS system_dlkm"
-          ${{ github.event.inputs.extract_odm }} && PARTITIONS="$PARTITIONS odm"
-          ${{ github.event.inputs.extract_odm_dlkm }} && PARTITIONS="$PARTITIONS odm_dlkm"
-          ${{ github.event.inputs.extract_boot }} && PARTITIONS="$PARTITIONS boot"
-          ${{ github.event.inputs.extract_init_boot }} && PARTITIONS="$PARTITIONS init_boot"
-          ${{ github.event.inputs.extract_vbmeta }} && PARTITIONS="$PARTITIONS vbmeta"
-          ${{ github.event.inputs.extract_vbmeta_system }} && PARTITIONS="$PARTITIONS vbmeta_system"
-          ${{ github.event.inputs.extract_dtbo }} && PARTITIONS="$PARTITIONS dtbo"
-          ${{ github.event.inputs.extract_recovery }} && PARTITIONS="$PARTITIONS recovery"
+          [ "$INPUT_SYSTEM" = "true" ] && PARTITIONS="$PARTITIONS system"
+          [ "$INPUT_SYSTEM_EXT" = "true" ] && PARTITIONS="$PARTITIONS system_ext"
+          [ "$INPUT_PRODUCT" = "true" ] && PARTITIONS="$PARTITIONS product"
+          [ "$INPUT_VENDOR" = "true" ] && PARTITIONS="$PARTITIONS vendor"
+          [ "$INPUT_VENDOR_BOOT" = "true" ] && PARTITIONS="$PARTITIONS vendor_boot"
+          [ "$INPUT_VENDOR_DLKM" = "true" ] && PARTITIONS="$PARTITIONS vendor_dlkm"
+          [ "$INPUT_SYSTEM_DLKM" = "true" ] && PARTITIONS="$PARTITIONS system_dlkm"
+          [ "$INPUT_ODM" = "true" ] && PARTITIONS="$PARTITIONS odm"
+          [ "$INPUT_ODM_DLKM" = "true" ] && PARTITIONS="$PARTITIONS odm_dlkm"
+          [ "$INPUT_BOOT" = "true" ] && PARTITIONS="$PARTITIONS boot"
+          [ "$INPUT_INIT_BOOT" = "true" ] && PARTITIONS="$PARTITIONS init_boot"
+          [ "$INPUT_VBMETA" = "true" ] && PARTITIONS="$PARTITIONS vbmeta"
+          [ "$INPUT_VBMETA_SYSTEM" = "true" ] && PARTITIONS="$PARTITIONS vbmeta_system"
+          [ "$INPUT_DTBO" = "true" ] && PARTITIONS="$PARTITIONS dtbo"
+          [ "$INPUT_RECOVERY" = "true" ] && PARTITIONS="$PARTITIONS recovery"
           
           PARTITIONS="${PARTITIONS# }"
           
@@ -147,8 +165,8 @@ jobs:
           fi
           
           bash scripts/extract_images.sh \
-            "${{ github.event.inputs.url }}" \
-            "${{ github.event.inputs.compression }}" \
+            "$INPUT_URL" \
+            "$INPUT_COMPRESSION" \
             "$PARTITIONS"
 
       - name: Get Firmware Info
