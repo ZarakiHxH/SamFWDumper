@@ -115,23 +115,39 @@ jobs:
         run: chmod +x tools/android-tools/* tools/erofs-utils/* upload_gofile.sh scripts/extract_system_files.sh
 
       - name: Run SamFWDumper
+        env:
+          INPUT_URL: ${{ github.event.inputs.url }}
+          INPUT_COMPRESSION: ${{ github.event.inputs.compression }}
+          INPUT_APP: ${{ github.event.inputs.extract_app }}
+          INPUT_BIN: ${{ github.event.inputs.extract_bin }}
+          INPUT_CAMERADATA: ${{ github.event.inputs.extract_cameradata }}
+          INPUT_ETC: ${{ github.event.inputs.extract_etc }}
+          INPUT_LIB: ${{ github.event.inputs.extract_lib }}
+          INPUT_LIB64: ${{ github.event.inputs.extract_lib64 }}
+          INPUT_MEDIA: ${{ github.event.inputs.extract_media }}
+          INPUT_PRIV_APP: ${{ github.event.inputs.extract_priv_app }}
+          INPUT_SAIV: ${{ github.event.inputs.extract_saiv }}
+          INPUT_BUILD_PROP: ${{ github.event.inputs.extract_build_prop }}
+          INPUT_FRAMEWORK_RRO: ${{ github.event.inputs.extract_framework_rro }}
+          INPUT_PIT: ${{ github.event.inputs.extract_pit }}
+          INPUT_WALLPAPER_RES: ${{ github.event.inputs.extract_wallpaper_res }}
         run: |
           bash scripts/extract_system_files.sh \
-            "${{ github.event.inputs.url }}" \
-            "${{ github.event.inputs.compression }}" \
-            "${{ github.event.inputs.extract_app }}" \
-            "${{ github.event.inputs.extract_bin }}" \
-            "${{ github.event.inputs.extract_cameradata }}" \
-            "${{ github.event.inputs.extract_etc }}" \
-            "${{ github.event.inputs.extract_lib }}" \
-            "${{ github.event.inputs.extract_lib64 }}" \
-            "${{ github.event.inputs.extract_media }}" \
-            "${{ github.event.inputs.extract_priv_app }}" \
-            "${{ github.event.inputs.extract_saiv }}" \
-            "${{ github.event.inputs.extract_build_prop }}" \
-            "${{ github.event.inputs.extract_framework_rro }}" \
-            "${{ github.event.inputs.extract_pit }}" \
-            "${{ github.event.inputs.extract_wallpaper_res }}"
+            "$INPUT_URL" \
+            "$INPUT_COMPRESSION" \
+            "$INPUT_APP" \
+            "$INPUT_BIN" \
+            "$INPUT_CAMERADATA" \
+            "$INPUT_ETC" \
+            "$INPUT_LIB" \
+            "$INPUT_LIB64" \
+            "$INPUT_MEDIA" \
+            "$INPUT_PRIV_APP" \
+            "$INPUT_SAIV" \
+            "$INPUT_BUILD_PROP" \
+            "$INPUT_FRAMEWORK_RRO" \
+            "$INPUT_PIT" \
+            "$INPUT_WALLPAPER_RES"
 
       - name: Get Firmware Info
         id: fwinfo
