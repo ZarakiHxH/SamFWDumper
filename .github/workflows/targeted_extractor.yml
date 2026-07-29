@@ -71,12 +71,17 @@ jobs:
         run: chmod +x tools/android-tools/* tools/erofs-utils/* upload_gofile.sh scripts/extract_targeted.sh
 
       - name: Run Targeted Extraction
+        env:
+          INPUT_URL: ${{ github.event.inputs.url }}
+          INPUT_COMPRESSION: ${{ github.event.inputs.compression }}
+          INPUT_SHOW_ALL: ${{ github.event.inputs.show_all }}
+          INPUT_OUTPUT_NAME: ${{ github.event.inputs.output_name }}
         run: |
           bash scripts/extract_targeted.sh \
-            "${{ github.event.inputs.url }}" \
-            "${{ github.event.inputs.compression }}" \
-            "${{ github.event.inputs.show_all }}" \
-            "${{ github.event.inputs.output_name }}"
+            "$INPUT_URL" \
+            "$INPUT_COMPRESSION" \
+            "$INPUT_SHOW_ALL" \
+            "$INPUT_OUTPUT_NAME"
 
       - name: Get Firmware Info
         id: fwinfo
