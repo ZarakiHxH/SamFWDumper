@@ -9,7 +9,7 @@
 # Commercial use, removal of this header, or distribution without attribution
 # is strictly prohibited. For permissions: https://github.com/Xiatsuma
 # =============================================================================
-set -e
+set -eo pipefail
 
 echo "═══════════════════════════════════════"
 echo "   Samsung Images Extractor"
@@ -20,6 +20,10 @@ COMPRESSION_LEVEL="${2:-6}"
 SELECTED_PARTITIONS="$3"
 
 [ -z "$URL" ] && { echo "❌ No URL"; exit 1; }
+if ! echo "$URL" | grep -qE '^https?://'; then
+  echo "❌ Invalid URL: must start with http:// or https://"
+  exit 1
+fi
 [ -z "$SELECTED_PARTITIONS" ] && { echo "❌ No partitions selected"; exit 1; }
 
 case "$COMPRESSION_LEVEL" in
