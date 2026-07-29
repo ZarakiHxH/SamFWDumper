@@ -22,7 +22,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,7 +31,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq curl
 
       - name: Download and Upload
-        run: bash scripts/full_fwfetch.sh "${{ github.event.inputs.url }}"
+        env:
+          INPUT_URL: ${{ github.event.inputs.url }}
+        run: bash scripts/full_fwfetch.sh "$INPUT_URL"
 
       - name: Get Firmware Info
         id: fwinfo
