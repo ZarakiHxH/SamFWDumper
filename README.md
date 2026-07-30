@@ -10,7 +10,7 @@ You know those big firmware files from SamFW? This tool:
 - Downloads that file for you
 - Opens it up
 - Grabs only what you asked for
-- Gives you a download link
+- Gives you a direct download link
 
 You don't need a powerful computer. You don't need to install anything. GitHub's servers do all the work.
 
@@ -18,8 +18,8 @@ You don't need a powerful computer. You don't need to install anything. GitHub's
 
 ## Before You Start
 
-- Click the **Fork** button at the top right of this page and click fork to ur git account
-- Go to the **Actions** tab on your fork. If workflows are disabled, click **"I understand my workflows"**
+1. Click the **Fork** button at the top right of this page and fork it to your GitHub account.
+2. Go to the **Actions** tab on your fork. If workflows are disabled, click **"I understand my workflows, go ahead and enable them"**.
 
 Done. You only do this once.
 
@@ -27,73 +27,88 @@ Done. You only do this once.
 
 ## How to Get a Firmware Link
 
-Before using this tool, you need a direct download link from SamFW. Here's how:
+Before using this tool, you need a direct download link from SamFW:
 
-1. Go to [samfw.com](https://samfw.com) and search for your device, you can type the model number (e.g., `SM-S918B`) or the device name (e.g., `S23 Ultra`), then pick your region/CSC (e.g., `EUX`)
+1. Go to [samfw.com](https://samfw.com) and search for your device model number (e.g., `SM-S918B`) or device name (e.g., `S23 Ultra`), then pick your region/CSC (e.g., `EUX`).
+2. Choose the firmware version, then click the red button **"Download SamFW Server"**.
+3. Wait a moment until a **"Download"** button appears. Click it, then **cancel the download immediately**.
+4. Right-click the same **"Download"** button (or long-press on mobile) and select **"Copy link address"**.
 
-2. Choose the firmware version, then click the red button **"Download SamFW Server"**
-
-3. Wait a moment, a **"Download"** button will appear. Click it, then **cancel the download immediately**
-
-4. Now right-click the same **"Download"** button again (or long-press if you're on Android) and select **"Copy link address"**
-
-That link is what you'll paste into the workflow.
+That link is what you will paste into the workflow input.
 
 ---
 
-## Two Ways to Use It
+## Available Workflows (4 Ways to Use It)
 
-| | **Images Extractor** | **System Files Extractor** |
+| Workflow | What it gets you | Best used for |
 |---|---|---|
-| **Gets you** | Raw partition images | Files & folders from firmware |
-| **Use when** | Flash, inspect, or mod an image | Grab apps, configs, files from system |
+| **1. Images Extractor** | Raw partition images (`.img` / `.img.xz`) | Flashing, inspecting, or modding raw partition images |
+| **2. System Files Extractor** | Entire system folders & key files | Pulling complete folders (APKs, binaries, configs, libs, media, etc.) |
+| **3. Special Targeted Extractor** | Selective target lists & app directory listing | Pulling specific curated app/system lists or inspecting all apps with sizes |
+| **4. Full FWFetch** | Complete untouched firmware `.zip` | Fast cloud mirroring of full firmware packages directly to GoFile |
 
-**Steps (same for both):**
-- Go to **Actions** → pick your workflow above
-- Paste your SamFW link
-- Pick compression 0~9 (0 = fast but big file, 9 = slow but small file)
-- Choose upload destination (GoFile or GitHub Releases)
-- Tick what you want (see below)
-- Hit **Run workflow**. Wait a few minutes. Download link appears.
-
----
-
-**Images Extractor** - which partitions can you grab?
-
-`boot` `dtbo` `init_boot` `odm` `odm_dlkm` `product` `recovery` `system` `system_dlkm` `system_ext` `vbmeta` `vbmeta_system` `vendor` `vendor_boot` `vendor_dlkm`
+### Steps to Run Any Workflow:
+1. Go to your fork's **Actions** tab → select the desired workflow on the left sidebar.
+2. Click **Run workflow** dropdown on the right.
+3. Paste your SamFW direct download link.
+4. Configure options (compression level, destination, partition/folder selections).
+5. Click **Run workflow**. Wait a few minutes — your download link will appear under GitHub Releases or GoFile.
 
 ---
 
-**System Files Extractor** - which files and folders can you pull?
+## Partition & File Target Reference
 
-| | What's inside |
+### 1. Images Extractor — Supported Partitions
+`boot` | `dtbo` | `init_boot` | `odm` | `odm_dlkm` | `product` | `recovery` | `system` | `system_dlkm` | `system_ext` | `vbmeta` | `vbmeta_system` | `vendor` | `vendor_boot` | `vendor_dlkm`
+
+---
+
+### 2. System Files Extractor — Available Options
+
+| Target Checkbox | Description & Contents |
 |---|---|
-| `app` | Preinstalled apps (APKs) |
-| `bin` | System binaries |
-| `cameradata` | Camera tuning files |
-| `etc` | Configs and permissions |
-| `lib` | 32-bit libraries |
-| `lib64` | 64-bit libraries |
-| `media` | Sounds, fonts, boot animation |
-| `priv-app` | Privileged system apps |
-| `saiv` | Samsung AI Vision stuff |
-| `config` | XML configs |
-| `super config` | Super image metadata (for repacking) |
-| `build.prop` | Device info and fingerprint |
-| `framework-res RRO` | Overlay APK from product partition |
-| `PIT file` | Partition table from CSC |
-| `wallpaper-res.apk` | Wallpaper APK from priv-app |
+| `app` | Preinstalled system applications (APKs) |
+| `bin` | System executable binaries |
+| `cameradata` | Camera tuning & configuration files |
+| `etc` | System configs, permissions, & XML files |
+| `lib` | 32-bit shared libraries (`.so`) |
+| `lib64` | 64-bit shared libraries (`.so`) |
+| `media` | Audio files, ringtones, fonts, & boot animations |
+| `priv-app` | Privileged system applications |
+| `saiv` | Samsung AI Vision data folder |
+| `build.prop` | Device fingerprint & system properties |
+| `framework-res RRO` | Product overlay APK (`framework-res__auto_generated_rro_product.apk`) |
+| `PIT file` | Partition Information Table extracted from CSC archive |
+| `wallpaper-res.apk` | System wallpaper resources APK |
+
+---
+
+### 3. Special Targeted Extractor — Features
+- **Curated Extraction**: Uses target list files (`targets/system/*.txt`) to pull specific essential apps, configs, media, and libraries.
+- **Show All Mode (`show_all`)**: Scans `app` and `priv-app` directories and prints every installed folder along with its size, allowing full discovery of preinstalled packages.
+- **Custom Output Naming**: Allows setting a custom name for the resulting package (default: `Apps`).
+
+---
+
+### 4. Full FWFetch — Features
+- Downloads the entire firmware archive from SamFW.
+- Re-uploads it directly to **GoFile** without extra extraction processing.
+- Generates a GitHub Release containing the GoFile download link.
+
+---
 
 ## What's Happening Behind the Scenes
 
-1. Downloads the firmware zip
-2. Unzips it, finds the AP tar (and CSC when extracting PIT)
-3. Checks for dynamic partitions and unpacks super.img if found
-4. Grabs exactly what you selected, nothing extra
-5. Packages everything as `.xz` or `.tar.xz`
-6. Uploads to **GitHub Releases** or **GoFile** and gives you a link
+1. **Downloads**: Fetches the firmware zip directly via GitHub Actions runners.
+2. **Unpacks Archives**: Unzips the package and parses `AP` tar (and `CSC` tar for PIT extraction). Handles both raw `.img` and LZ4-compressed `.img.lz4` files.
+3. **Super Image Handling**: Unpacks dynamic partition `super.img` via `lpunpack` (supporting EROFS, EXT4, and F2FS file systems).
+4. **Targeted Extraction**: Extracts strictly requested partitions or file trees.
+5. **Compression**: Packages outputs using `xz` compression (levels 0 to 9; `0` = uncompressed tar/zip for speed, `9` = maximum compression) or leaves raw binaries as requested.
+6. **Delivery**: Uploads resulting assets to **GitHub Releases** or **GoFile** and generates a link in release notes.
 
-Works on both legacy and modern Samsung devices. If the device uses A/B slots, partition names are kept untouched (`_a` and `_b`).
+Works on both legacy and modern Samsung devices. Supports A/B slot partition schemes (`_a` and `_b`).
+
+---
 
 ## License
 
@@ -101,8 +116,10 @@ This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENS
 
 **Distribution Restriction:** Redistribution of this software, modified or unmodified, is ONLY permitted via GitHub's official fork mechanism from this repository. Direct copying, re-uploading, or creating standalone repositories of this code is prohibited.
 
-See the [LICENSE](LICENSE) file for the full terms.
+See the [LICENSE](LICENSE) file for full terms.
 For commercial licensing inquiries, contact the repository owner via GitHub.
+
+---
 
 ## Tools Used
 
@@ -121,6 +138,8 @@ This project relies on several open-source tools:
 - [lz4](https://github.com/lz4/lz4) (BSD-2-Clause) - LZ4 compression
 
 Upload integration via [GoFile API](https://gofile.io/api).
+
+---
 
 ## Credits
 
