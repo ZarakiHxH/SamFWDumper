@@ -10,11 +10,11 @@ You know those big firmware files from SamFW? This tool:
 - Downloads that file for you
 - Opens it up
 - Grabs only what you asked for
-- Gives you a direct download link
+- Gives you a download link
 
 You don't need a powerful computer. You don't need to install anything. GitHub's servers do all the work.
 
----
+***
 
 ## Before You Start
 
@@ -23,7 +23,7 @@ You don't need a powerful computer. You don't need to install anything. GitHub's
 
 Done. You only do this once.
 
----
+***
 
 ## How to Get a Firmware Link
 
@@ -34,112 +34,112 @@ Before using this tool, you need a direct download link from SamFW:
 3. Wait a moment until a **"Download"** button appears. Click it, then **cancel the download immediately**.
 4. Right-click the same **"Download"** button (or long-press on mobile) and select **"Copy link address"**.
 
-That link is what you will paste into the workflow input.
+That link is what you will paste into the workflow.
 
----
+***
 
 ## Available Workflows (4 Ways to Use It)
 
-| Workflow | What it gets you | Best used for |
+| Workflow | What it gets you | Use it when |
 |---|---|---|
-| **1. Images Extractor** | Raw partition images (`.img` / `.img.xz`) | Flashing, inspecting, or modding raw partition images |
-| **2. System Files Extractor** | Entire system folders & key files | Pulling complete folders (APKs, binaries, configs, libs, media, etc.) |
-| **3. Special Targeted Extractor** | Selective target lists & app directory listing | Pulling specific curated app/system lists or inspecting all apps with sizes |
-| **4. Full FWFetch** | Complete untouched firmware `.zip` | Fast cloud mirroring of full firmware packages directly to GoFile |
+| **1. Images Extractor** | Raw partition images (`.img` or `.img.xz`) | You want raw partition images (like `boot.img` or `system.img`) to flash, inspect, or mod |
+| **2. System Files Extractor** | Entire system folders and files | You want folders like apps, libraries, media, configs, or build properties |
+| **3. Special Targeted Extractor** | Specific app lists or full app directory scan | You want specific pre-selected apps/files, or want to view all installed apps and their sizes |
+| **4. Full FWFetch** | Complete unchanged firmware `.zip` | You just want the original full firmware uploaded to GoFile for a fast mirror link |
 
-### Steps to Run Any Workflow:
-1. Go to your fork's **Actions** tab → select the desired workflow on the left sidebar.
-2. Click **Run workflow** dropdown on the right.
-3. Paste your SamFW direct download link.
-4. Configure options (compression level, destination, partition/folder selections).
-5. Click **Run workflow**. Wait a few minutes — your download link will appear under GitHub Releases or GoFile.
+### Quick Guide to Each Workflow
 
----
+#### 1. Images Extractor
+Extracts partition images directly out of the firmware. You can pick any combination of these partitions:
 
-## Partition & File Target Reference
+`boot` `dtbo` `init_boot` `odm` `odm_dlkm` `product` `recovery` `system` `system_dlkm` `system_ext` `vbmeta` `vbmeta_system` `vendor` `vendor_boot` `vendor_dlkm`
 
-### 1. Images Extractor — Supported Partitions
-`boot` | `dtbo` | `init_boot` | `odm` | `odm_dlkm` | `product` | `recovery` | `system` | `system_dlkm` | `system_ext` | `vbmeta` | `vbmeta_system` | `vendor` | `vendor_boot` | `vendor_dlkm`
+#### 2. System Files Extractor
+Pulls complete file categories directly out of the system partitions. Here are the options you can check:
 
----
-
-### 2. System Files Extractor — Available Options
-
-| Target Checkbox | Description & Contents |
+| Checkbox | What you get |
 |---|---|
-| `app` | Preinstalled system applications (APKs) |
-| `bin` | System executable binaries |
-| `cameradata` | Camera tuning & configuration files |
-| `etc` | System configs, permissions, & XML files |
-| `lib` | 32-bit shared libraries (`.so`) |
-| `lib64` | 64-bit shared libraries (`.so`) |
-| `media` | Audio files, ringtones, fonts, & boot animations |
-| `priv-app` | Privileged system applications |
-| `saiv` | Samsung AI Vision data folder |
-| `build.prop` | Device fingerprint & system properties |
+| `app` | Preinstalled system apps (APKs) |
+| `bin` | System binary tools and scripts |
+| `cameradata` | Camera tuning and config files |
+| `etc` | System configuration and permission files |
+| `lib` | 32-bit system libraries (`.so`) |
+| `lib64` | 64-bit system libraries (`.so`) |
+| `media` | System sounds, ringtones, fonts, and boot animation |
+| `priv-app` | Privileged system apps |
+| `saiv` | Samsung AI Vision folder |
+| `build.prop` | Device fingerprint and system properties |
 | `framework-res RRO` | Product overlay APK (`framework-res__auto_generated_rro_product.apk`) |
-| `PIT file` | Partition Information Table extracted from CSC archive |
+| `PIT file` | Partition Information Table from the CSC file |
 | `wallpaper-res.apk` | System wallpaper resources APK |
 
----
+#### 3. Special Targeted Extractor
+Use this if you don't want whole folders and only need specific items.
+- **Pre-set target lists**: Uses text files in `targets/system/` to pick out key apps, framework files, media, and libraries.
+- **`show_all` mode**: If enabled, it lists every single app folder inside `app` and `priv-app` along with its exact size in the workflow logs.
+- **Custom folder name**: Lets you change the output folder name (defaults to `Apps`).
 
-### 3. Special Targeted Extractor — Features
-- **Curated Extraction**: Uses target list files (`targets/system/*.txt`) to pull specific essential apps, configs, media, and libraries.
-- **Show All Mode (`show_all`)**: Scans `app` and `priv-app` directories and prints every installed folder along with its size, allowing full discovery of preinstalled packages.
-- **Custom Output Naming**: Allows setting a custom name for the resulting package (default: `Apps`).
+#### 4. Full FWFetch
+The simplest option. It downloads the whole firmware zip from SamFW and uploads it to GoFile as a direct mirror link. No extraction or processing is done on the files.
 
----
+***
 
-### 4. Full FWFetch — Features
-- Downloads the entire firmware archive from SamFW.
-- Re-uploads it directly to **GoFile** without extra extraction processing.
-- Generates a GitHub Release containing the GoFile download link.
+## How to Run Any Workflow
 
----
+1. Go to the **Actions** tab in your repository fork.
+2. Select the workflow you want from the left side list.
+3. Click **Run workflow** on the right.
+4. Paste your SamFW link.
+5. Pick your compression level (0 = fast/uncompressed, 9 = maximum compression) and upload destination (GoFile or GitHub Releases).
+6. Check the items you want and click **Run workflow**.
+
+Wait a few minutes for the workflow to complete. Your download link will show up under GitHub Releases or in the step output for GoFile.
+
+***
 
 ## What's Happening Behind the Scenes
 
-1. **Downloads**: Fetches the firmware zip directly via GitHub Actions runners.
-2. **Unpacks Archives**: Unzips the package and parses `AP` tar (and `CSC` tar for PIT extraction). Handles both raw `.img` and LZ4-compressed `.img.lz4` files.
-3. **Super Image Handling**: Unpacks dynamic partition `super.img` via `lpunpack` (supporting EROFS, EXT4, and F2FS file systems).
-4. **Targeted Extraction**: Extracts strictly requested partitions or file trees.
-5. **Compression**: Packages outputs using `xz` compression (levels 0 to 9; `0` = uncompressed tar/zip for speed, `9` = maximum compression) or leaves raw binaries as requested.
-6. **Delivery**: Uploads resulting assets to **GitHub Releases** or **GoFile** and generates a link in release notes.
+1. Downloads the firmware zip from SamFW on GitHub Actions servers.
+2. Unzips the main package to get the AP and CSC tar files, and decompresses any `.lz4` files.
+3. If the device uses a `super.img` dynamic partition, it unpacks it using `lpunpack`. It supports EROFS, EXT4, and F2FS filesystems.
+4. Extracts only the partitions, folders, or specific files you selected.
+5. Compresses the output using `xz` (or builds a standard `.tar`/`.zip` if compression level is set to 0).
+6. Uploads the finished files to GoFile or GitHub Releases and provides your download link.
 
-Works on both legacy and modern Samsung devices. Supports A/B slot partition schemes (`_a` and `_b`).
+Works on legacy and modern Samsung devices, including devices with A/B slot partition layouts (`_a` and `_b`).
 
----
+***
 
 ## License
 
-This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE) - personal and non-commercial use only.
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE) for personal and non-commercial use.
 
 **Distribution Restriction:** Redistribution of this software, modified or unmodified, is ONLY permitted via GitHub's official fork mechanism from this repository. Direct copying, re-uploading, or creating standalone repositories of this code is prohibited.
 
 See the [LICENSE](LICENSE) file for full terms.
-For commercial licensing inquiries, contact the repository owner via GitHub.
 
----
+***
 
-## Tools Used
+## Tools Used & Credits
 
-This project relies on several open-source tools:
+This project relies on several open-source tools to handle Android images, filesystems, and compression.
 
-- [nmeum/android-tools](https://github.com/nmeum/android-tools) (Apache-2.0) - simg2img, img2simg, ext2simg, append2simg
-- [LonelyFool/lpunpack_and_lpmake](https://github.com/LonelyFool/lpunpack_and_lpmake) (Apache-2.0) - lpunpack, lpdump, lpmake
-- [sekaiacg/erofs-utils](https://github.com/sekaiacg/erofs-utils) (GPL-2.0/Apache-2.0) - EROFS filesystem tools
-- [AOSP platform/external/avb](https://android.googlesource.com/platform/external/avb) (Apache-2.0) - avbtool
-- [AOSP platform/external/e2fsprogs](https://android.googlesource.com/platform/external/e2fsprogs) (Apache-2.0) - e2fsdroid, mke2fs.android
-- [AOSP platform/external/f2fs-tools](https://android.googlesource.com/platform/external/f2fs-tools) (Apache-2.0) - make_f2fs, sload_f2fs
-- [AOSP platform/system/tools/mkbootimg](https://android.googlesource.com/platform/system/tools/mkbootimg) (Apache-2.0) - mkbootimg, unpack_bootimg, repack_bootimg
-- [AOSP platform/system/libufdt](https://android.googlesource.com/platform/system/libufdt) (Apache-2.0) - mkdtboimg
-- [tytso/e2fsprogs](https://github.com/tytso/e2fsprogs) (GPL-2.0/LGPL-2.1) - debugfs
-- [tukaani/xz](https://github.com/tukaani-project/xz) (LGPL-2.1/GPL-2.0) - xz compression
-- [lz4](https://github.com/lz4/lz4) (BSD-2-Clause) - LZ4 compression
+### Bundled Binaries (inside `tools/`)
+- [nmeum/android-tools](https://github.com/nmeum/android-tools) (Apache-2.0) - `simg2img`, `img2simg`, `ext2simg`, `append2simg` for sparse image conversion.
+- [LonelyFool/lpunpack_and_lpmake](https://github.com/LonelyFool/lpunpack_and_lpmake) (Apache-2.0) - `lpunpack` used to extract Samsung `super.img` dynamic partitions.
+- [sekaiacg/erofs-utils](https://github.com/sekaiacg/erofs-utils) (GPL-2.0/Apache-2.0) - `extract.erofs` used to read EROFS partition images.
+- [AOSP Tools](https://android.googlesource.com/) (Apache-2.0) - Android build binaries (`mkbootimg`, `unpack_bootimg`, `repack_bootimg`, `avbtool`, `mkdtboimg`).
 
-Upload integration via [GoFile API](https://gofile.io/api).
+### System Dependencies (installed during workflow execution)
+- [e2fsprogs](https://github.com/tytso/e2fsprogs) (GPL-2.0/LGPL-2.1) - `debugfs` used to read EXT4 images without root mounting.
+- [f2fs-tools](https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git) (GPL-2.0/LGPL-2.1) - Linux kernel tools used for F2FS partition mounts.
+- [lz4](https://github.com/lz4/lz4) (BSD-2-Clause) - LZ4 decompression tool for Samsung `.lz4` partition files.
+- [xz-utils](https://github.tukaani.org/xz-utils/) (LGPL-2.1/GPL-2.0) - XZ compression utility for output archives.
+- [curl](https://curl.se/) & [jq](https://jqlang.github.io/jq/) - API request and JSON formatting tools for GoFile uploads.
 
----
+Upload integration powered by [GoFile API](https://gofile.io/api).
+
+***
 
 ## Credits
 
@@ -148,7 +148,7 @@ Upload integration via [GoFile API](https://gofile.io/api).
 <a href="https://samfw.com" target="_blank"><img src="https://img.shields.io/badge/🌐_SamFW-Firmware_Source-181717?style=for-the-badge&labelColor=1428A0" alt="SamFW"></a><br>
 <sub>The platform that makes firmware accessible to everyone. The backbone this project stands on.</sub>
 
----
+***
 
 <table>
 <tr>
@@ -188,6 +188,6 @@ Upload integration via [GoFile API](https://gofile.io/api).
 
 </div>
 
----
+***
 
 Copyright © 2026 Xiatsuma
