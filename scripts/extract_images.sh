@@ -87,11 +87,15 @@ is_selected() {
 }
 
 echo ""; echo "[1/5] Downloading..."
-wget --no-check-certificate --content-disposition "$URL" 2>&1 | tail -3
+wget --tries=3 --timeout=60 --no-check-certificate --content-disposition "$URL" 2>&1 | tail -3
 ZIP_FILE=$(ls -t *.zip 2>/dev/null | head -1)
 [ ! -f "$ZIP_FILE" ] && { echo "❌ Download failed"; exit 1; }
 FILESIZE=$(stat -c%s "$ZIP_FILE")
 [ "$FILESIZE" -eq 0 ] && { echo "❌ Empty file"; exit 1; }
+if ! unzip -l "$ZIP_FILE" >/dev/null 2>&1; then
+  echo "❌ Downloaded file is not a valid ZIP archive"
+  exit 1
+fi
 echo "✅ Downloaded: $(numfmt --to=iec $FILESIZE)"
 
 CSC_CODE=$(echo "$ZIP_FILE" | sed 's/\.zip$//' | tr '_' '\n' | grep -E '^[A-Z]{3}$' | grep -v -E '^(COM|SAM|FAC)$' | head -1)
@@ -112,13 +116,33 @@ AP_FILE=$(find . -name "AP_*.tar.md5" -o -name "AP_*.tar" | head -n 1)
 [ -z "$AP_FILE" ] && { echo "❌ AP file not found"; exit 1; }
 echo "  Extracting: $(basename "$AP_FILE")"
 
-EXTRACT_ARGS=()
-for PART in $SELECTED_PARTITIONS; do
-  EXTRACT_ARGS+=("*${PART}.img*" "*${PART}_a.img*" "*${PART}_b.img*")
-done
-$NEED_SUPER && EXTRACT_ARGS+=("*super.img*")
+# Collect exact archive members for the selected partitions (avoids over-matching
+# names like init_boot/vendor_boot when only boot is requested).
+MATCHED=()
+while IFS= read -r MEMBER; do
+  BASE=$(basename "$MEMBER")
+  FOUND=false
+  for PART in $SELECTED_PARTITIONS; do
+    for SUFFIX in "" "_a" "_b"; do
+      for EXT in ".img" ".img.lz4"; do
+        if [[ "$BASE" == "${PART}${SUFFIX}${EXT}"* ]]; then
+          MATCHED+=("$MEMBER")
+          FOUND=true
+          break 3
+        fi
+      done
+    done
+  done
+  if ! $FOUND && $NEED_SUPER && [[ "$BASE" == super.img* ]]; then
+    MATCHED+=("$MEMBER")
+  fi
+done < <(tar -tf "$AP_FILE" 2>/dev/null)
 
-tar --no-anchored --wildcards -xf "$AP_FILE" "${EXTRACT_ARGS[@]}" 2>/dev/null || tar -xf "$AP_FILE" >/dev/null 2>&1
+if [ ${#MATCHED[@]} -gt 0 ]; then
+  tar -xf "$AP_FILE" "${MATCHED[@]}" 2>/dev/null
+else
+  echo "  ⚠️ No matching images found in AP"
+fi
 
 echo ""
 echo "  Contents:"
@@ -153,7 +177,9 @@ for PART in $SELECTED_PARTITIONS; do
     fi
     
     BASENAME=$(basename "$FILE")
-    if xz $XZ_FLAGS -T0 "$FILE" 2>/dev/null; then
+    if [ "$COMPRESSION_LEVEL" = "0" ]; then
+      cp "$FILE" "processed/${BASENAME}"
+    elif xz $XZ_FLAGS -T0 "$FILE" 2>/dev/null; then
       mv "${FILE}.xz" "processed/${BASENAME}.xz"
     else
       cp "$FILE" "processed/${BASENAME}"
@@ -225,7 +251,9 @@ if $NEED_SUPER && [ -n "$SUPER_FILE" ] && [ -f "$SUPER_FILE" ]; then
       IMG_FILE="super_dump/${PART}${SUFFIX}.img"
       if [ -f "$IMG_FILE" ]; then
         BASENAME="${PART}${SUFFIX}.img"
-        if xz $XZ_FLAGS -T0 "$IMG_FILE" 2>/dev/null; then
+        if [ "$COMPRESSION_LEVEL" = "0" ]; then
+          cp "$IMG_FILE" "processed/${BASENAME}"
+        elif xz $XZ_FLAGS -T0 "$IMG_FILE" 2>/dev/null; then
           mv "${IMG_FILE}.xz" "processed/${BASENAME}.xz"
         else
           cp "$IMG_FILE" "processed/${BASENAME}"

@@ -17,12 +17,21 @@ on:
       url:
         description: 'SamFW Direct Download Link'
         required: true
+      gofile_token:
+        description: 'GoFile API token (optional - higher upload limits)'
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 300
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,6 +42,7 @@ jobs:
       - name: Download and Upload
         env:
           INPUT_URL: ${{ github.event.inputs.url }}
+          GOFILE_TOKEN: ${{ github.event.inputs.gofile_token }}
         run: bash scripts/full_fwfetch.sh "$INPUT_URL"
 
       - name: Get Firmware Info

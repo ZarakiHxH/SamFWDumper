@@ -157,11 +157,15 @@ extract_f2fs() {
 }
 
 echo ""; echo "[1/8] Downloading..."
-wget -q --no-check-certificate --content-disposition "$URL"
+wget -q --tries=3 --timeout=60 --no-check-certificate --content-disposition "$URL"
 ZIP_FILE=$(ls -t *.zip 2>/dev/null | head -1)
 [ ! -f "$ZIP_FILE" ] && { echo "❌ Download failed"; exit 1; }
 FILESIZE=$(stat -c%s "$ZIP_FILE")
 [ "$FILESIZE" -eq 0 ] && { echo "❌ Empty file"; exit 1; }
+if ! unzip -l "$ZIP_FILE" >/dev/null 2>&1; then
+  echo "❌ Downloaded file is not a valid ZIP archive"
+  exit 1
+fi
 echo "✅ Downloaded: $(numfmt --to=iec $FILESIZE)"
 
 CSC_CODE=$(echo "$ZIP_FILE" | sed 's/\.zip$//' | tr '_' '\n' | grep -E '^[A-Z]{3}$' | grep -v -E '^(COM|SAM|FAC)$' | head -1)

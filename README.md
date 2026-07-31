@@ -52,7 +52,7 @@ That link is what you will paste into the workflow.
 #### 1. Images Extractor
 Extracts partition images directly out of the firmware. You can pick any combination of these partitions:
 
-`boot` `dtbo` `init_boot` `odm` `odm_dlkm` `product` `recovery` `system` `system_dlkm` `system_ext` `vbmeta` `vbmeta_system` `vendor` `vendor_boot` `vendor_dlkm`
+`boot` `dtbo` `init_boot` `odm` `odm_dlkm` `optics` `prism` `product` `recovery` `system` `system_dlkm` `system_ext` `vbmeta` `vbmeta_system` `vendor` `vendor_boot` `vendor_dlkm`
 
 #### 2. System Files Extractor
 Pulls complete file categories directly out of the system partitions. Here are the options you can check:
@@ -182,6 +182,16 @@ Upload integration powered by [GoFile API](https://gofile.io/api).
 <b>MRX7014</b>
 </a><br>
 <sub>For the extraordinary commitment of being alive. Truly, it's enough we see you. </sub>
+</td>
+</tr>
+<tr>
+<td colspan="3" align="center">
+<br>
+<a href="https://github.com/Il103" target="_blank">
+<img src="https://github.com/Il103.png" width="64" height="64" style="border-radius:50%"><br>
+<b>B E R U</b>
+</a><br>
+<sub>For the full code review and bug fixes - the release permissions fix, workflow & dependency hardening, download validation, upload retries with GoFile token support, and the new optics/prism partitions. Legend. </sub>
 </td>
 </tr>
 </table>
