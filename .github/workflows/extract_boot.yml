@@ -9,7 +9,7 @@
 # is strictly prohibited. For permissions: https://github.com/Xiatsuma
 # =============================================================================
 
-name: 3. Special Targeted Extractor
+name: 4. Boot & Kernel Extractor
 
 on:
   workflow_dispatch:
@@ -39,14 +39,18 @@ on:
         description: 'GoFile API token (optional - higher upload limits)'
         required: false
         type: string
-      show_all:
-        description: 'Show ALL folders in app & priv-app'
-        type: boolean
-        default: false
-      output_name:
-        description: 'Output .zip name (default: Apps)'
-        required: false
-        default: 'Apps'
+      images:
+        description: 'Images to unpack (kernel + ramdisk)'
+        required: true
+        default: 'boot'
+        type: choice
+        multiple: true
+        options:
+        - 'boot'
+        - 'vendor_boot'
+        - 'init_boot'
+        - 'recovery'
+        - 'dtbo'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -76,25 +80,24 @@ jobs:
             file \
             vim-common \
             android-sdk-libsparse-utils \
-            e2fsprogs \
-            f2fs-tools \
-            linux-modules-extra-$(uname -r)
+            cpio \
+            xxd \
+            openssl
 
       - name: Make tools executable
-        run: chmod +x tools/android-tools/* tools/erofs-utils/* upload_gofile.sh scripts/extract_targeted.sh
+        run: chmod +x tools/android-tools/* tools/erofs-utils/* upload_gofile.sh scripts/extract_boot.sh
 
-      - name: Run Targeted Extraction
+      - name: Run Boot Extraction
         env:
           INPUT_URL: ${{ github.event.inputs.url }}
           INPUT_COMPRESSION: ${{ github.event.inputs.compression }}
-          INPUT_SHOW_ALL: ${{ github.event.inputs.show_all }}
-          INPUT_OUTPUT_NAME: ${{ github.event.inputs.output_name }}
+          INPUT_IMAGES: ${{ github.event.inputs.images }}
         run: |
-          bash scripts/extract_targeted.sh \
+          SELECTED=$(echo "$INPUT_IMAGES" | tr ',' ' ')
+          bash scripts/extract_boot.sh \
             "$INPUT_URL" \
             "$INPUT_COMPRESSION" \
-            "$INPUT_SHOW_ALL" \
-            "$INPUT_OUTPUT_NAME"
+            "$SELECTED"
 
       - name: Get Firmware Info
         id: fwinfo
@@ -191,4 +194,3 @@ jobs:
             "${ASSETS[@]}"
 
           rm -f "$NOTES_FILE"
-          

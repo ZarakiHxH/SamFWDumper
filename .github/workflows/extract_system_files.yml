@@ -35,6 +35,10 @@ on:
         options:
         - 'gofile'
         - 'github releases'
+      gofile_token:
+        description: 'GoFile API token (optional - higher upload limits)'
+        required: false
+        type: string
       extract_app:
         description: 'app (Preinstalled APKs)'
         type: boolean
@@ -88,9 +92,14 @@ on:
         type: boolean
         default: false
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   extract:
     runs-on: ubuntu-latest
+    timeout-minutes: 300
     permissions:
       contents: write
     steps:
@@ -105,7 +114,11 @@ jobs:
             xz-utils \
             lz4 \
             unzip \
+            zip \
             curl \
+            wget \
+            file \
+            vim-common \
             android-sdk-libsparse-utils \
             e2fsprogs \
             f2fs-tools \
@@ -173,6 +186,7 @@ jobs:
         if: ${{ github.event.inputs.upload_destination == 'gofile' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOFILE_TOKEN: ${{ github.event.inputs.gofile_token }}
         run: |
           if [ ! -d "output" ] || [ -z "$(ls -A output)" ]; then
             echo "❌ No files to upload"

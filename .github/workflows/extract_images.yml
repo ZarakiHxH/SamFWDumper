@@ -35,6 +35,10 @@ on:
         options:
         - 'gofile'
         - 'github releases'
+      gofile_token:
+        description: 'GoFile API token (optional - higher upload limits)'
+        required: false
+        type: string
       extract_system:
         description: 'system.img'
         type: boolean
@@ -95,10 +99,23 @@ on:
         description: 'recovery.img'
         type: boolean
         default: false
+      extract_optics:
+        description: 'optics.img'
+        type: boolean
+        default: false
+      extract_prism:
+        description: 'prism.img'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   dump:
     runs-on: ubuntu-latest
+    timeout-minutes: 300
     permissions:
       contents: write
     steps:
@@ -113,8 +130,12 @@ jobs:
             xz-utils \
             lz4 \
             unzip \
+            zip \
             curl \
+            wget \
             binutils \
+            file \
+            vim-common \
             android-sdk-libsparse-utils
 
       - name: Make tools executable
@@ -139,6 +160,8 @@ jobs:
           INPUT_VBMETA_SYSTEM: ${{ github.event.inputs.extract_vbmeta_system }}
           INPUT_DTBO: ${{ github.event.inputs.extract_dtbo }}
           INPUT_RECOVERY: ${{ github.event.inputs.extract_recovery }}
+          INPUT_OPTICS: ${{ github.event.inputs.extract_optics }}
+          INPUT_PRISM: ${{ github.event.inputs.extract_prism }}
         run: |
           PARTITIONS=""
           [ "$INPUT_SYSTEM" = "true" ] && PARTITIONS="$PARTITIONS system"
@@ -156,6 +179,8 @@ jobs:
           [ "$INPUT_VBMETA_SYSTEM" = "true" ] && PARTITIONS="$PARTITIONS vbmeta_system"
           [ "$INPUT_DTBO" = "true" ] && PARTITIONS="$PARTITIONS dtbo"
           [ "$INPUT_RECOVERY" = "true" ] && PARTITIONS="$PARTITIONS recovery"
+          [ "$INPUT_OPTICS" = "true" ] && PARTITIONS="$PARTITIONS optics"
+          [ "$INPUT_PRISM" = "true" ] && PARTITIONS="$PARTITIONS prism"
           
           PARTITIONS="${PARTITIONS# }"
           
@@ -193,6 +218,7 @@ jobs:
         if: ${{ github.event.inputs.upload_destination == 'gofile' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOFILE_TOKEN: ${{ github.event.inputs.gofile_token }}
         run: |
           if [ ! -d "processed" ] || [ -z "$(ls -A processed)" ]; then
             echo "❌ No files to upload"

@@ -9,7 +9,7 @@
 # is strictly prohibited. For permissions: https://github.com/Xiatsuma
 # =============================================================================
 
-name: 3. Special Targeted Extractor
+name: 5. CSC / OMC Extractor
 
 on:
   workflow_dispatch:
@@ -39,14 +39,26 @@ on:
         description: 'GoFile API token (optional - higher upload limits)'
         required: false
         type: string
-      show_all:
-        description: 'Show ALL folders in app & priv-app'
+      extract_csc:
+        description: 'Extract csc/ folder (CSC config)'
+        required: true
+        type: boolean
+        default: true
+      extract_omc:
+        description: 'Extract omc/ folder (multi-CSC config)'
+        required: true
+        type: boolean
+        default: true
+      extract_pit:
+        description: 'Extract .pit files (partition layout)'
+        required: true
+        type: boolean
+        default: true
+      extract_cp:
+        description: 'Extract CP modem files'
+        required: true
         type: boolean
         default: false
-      output_name:
-        description: 'Output .zip name (default: Apps)'
-        required: false
-        default: 'Apps'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -75,26 +87,27 @@ jobs:
             wget \
             file \
             vim-common \
-            android-sdk-libsparse-utils \
-            e2fsprogs \
-            f2fs-tools \
-            linux-modules-extra-$(uname -r)
+            android-sdk-libsparse-utils
 
       - name: Make tools executable
-        run: chmod +x tools/android-tools/* tools/erofs-utils/* upload_gofile.sh scripts/extract_targeted.sh
+        run: chmod +x tools/android-tools/* tools/erofs-utils/* upload_gofile.sh scripts/extract_csc.sh
 
-      - name: Run Targeted Extraction
+      - name: Run CSC Extraction
         env:
           INPUT_URL: ${{ github.event.inputs.url }}
           INPUT_COMPRESSION: ${{ github.event.inputs.compression }}
-          INPUT_SHOW_ALL: ${{ github.event.inputs.show_all }}
-          INPUT_OUTPUT_NAME: ${{ github.event.inputs.output_name }}
+          INPUT_CSC: ${{ github.event.inputs.extract_csc }}
+          INPUT_OMC: ${{ github.event.inputs.extract_omc }}
+          INPUT_PIT: ${{ github.event.inputs.extract_pit }}
+          INPUT_CP: ${{ github.event.inputs.extract_cp }}
         run: |
-          bash scripts/extract_targeted.sh \
+          bash scripts/extract_csc.sh \
             "$INPUT_URL" \
             "$INPUT_COMPRESSION" \
-            "$INPUT_SHOW_ALL" \
-            "$INPUT_OUTPUT_NAME"
+            "$INPUT_CSC" \
+            "$INPUT_OMC" \
+            "$INPUT_PIT" \
+            "$INPUT_CP"
 
       - name: Get Firmware Info
         id: fwinfo
@@ -191,4 +204,3 @@ jobs:
             "${ASSETS[@]}"
 
           rm -f "$NOTES_FILE"
-          

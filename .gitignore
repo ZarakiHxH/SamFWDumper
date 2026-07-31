@@ -1,0 +1,18 @@
+# Local test artifacts
+firmware.zip
+*.zip
+*.tar
+*.tar.md5
+*.img
+*.img.lz4
+*.xz
+download_url.txt
+links.txt
+ap_code.txt
+csc_code.txt
+processed/
+output/
+super_dump/
+super.raw.img
+system_extracted/
+product_extracted/
